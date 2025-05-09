@@ -1,6 +1,6 @@
 {
   "name": "react-native-tenty",
-  "displayName": "react-native-tenty",
+  "displayName": "Tenty",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -15,21 +15,49 @@
     "commands": [
       {
         "command": "react-native-tenty.createNewComponent",
-        "title": "Tenty: Create New Component"
+        "title": "Tenty: Create New Component",
+        "enablement": "react-native-tenty.react-native.enabled"
       },
       {
         "command": "react-native-tenty.createNewReduxModule",
-        "title": "Tenty: Create New Redux Module"
+        "title": "Tenty: Create New Redux Module",
+        "enablement": "react-native-tenty.redux-saga.enabled"
       },
       {
         "command": "react-native-tenty.createReducer",
-        "title": "Tenty: Create Reducer"
+        "title": "Tenty: Create Reducer",
+        "enablement": "react-native-tenty.redux-saga.enabled"
       },
       {
         "command": "react-native-tenty.createAction",
-        "title": "Tenty: Create Action"
+        "title": "Tenty: Create Action",
+        "enablement": "react-native-tenty.redux-saga.enabled"
+      },
+      {
+        "command": "react-native-tenty.selectModules",
+        "title": "Tenty: Select Modules"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Tenty",
+      "properties": {
+        "react-native-tenty.redux-saga.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Saga-Redux-specific tools"
+        },
+        "react-native-tenty.react-native.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable React Native utilities"
+        },
+        "react-native-tenty.react.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable React utilities"
+        }
+      }
+    }
   },
   "publisher": "DMykO",
   "scripts": {
