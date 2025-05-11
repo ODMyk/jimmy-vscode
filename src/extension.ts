@@ -32,115 +32,118 @@ const pickerOptions: ModulePickerEntry[] = [
   },
 ];
 
-export function activate(context: vscode.ExtensionContext) {
+function getIncludedModules() {
   const config = vscode.workspace.getConfiguration(EXTENSION_NAME);
-
-  const includedModules = allModules.filter((module) =>
+  return allModules.filter((module) =>
     config.get<boolean>(`${module}.enabled`),
   );
+}
 
-  function updateSnippetProviders(includedModules: Modules[]) {
-    context.subscriptions.forEach((sub, i) => {
-      if ((sub as any).__isSnippetProvider) {
-        sub.dispose();
-        context.subscriptions.splice(i, 1);
-      }
-    });
-    for (const moduleName of includedModules) {
-      const moduleSnippets = getSnippetsForModule(moduleName);
-      if (moduleSnippets === undefined || moduleSnippets.length === 0) {
-        continue;
-      }
-      const provider = vscode.languages.registerCompletionItemProvider(
-        {scheme: "file", language: "typescript"},
-        {
-          provideCompletionItems(document, position) {
-            const linePrefix = document
-              .lineAt(position)
-              .text.substring(0, position.character);
-            const wordRange = document.getWordRangeAtPosition(position);
-            const currentWord = wordRange ? document.getText(wordRange) : "";
-
-            return moduleSnippets.map((snippet) => {
-              const item = new vscode.CompletionItem(
-                snippet.prefix,
-                vscode.CompletionItemKind.Snippet,
-              );
-              item.insertText = new vscode.SnippetString(snippet.body);
-              item.detail = snippet.description;
-
-              item.filterText = snippet.prefix;
-
-              item.sortText = "0" + snippet.prefix;
-
-              return item;
-            });
-          },
-        },
-        ".",
-      );
-      (provider as any).__isSnippetProvider = true;
-      context.subscriptions.push(provider);
-    }
+function registerCommands(context: vscode.ExtensionContext) {
+  for (const command of commands) {
+    context.subscriptions.push(
+      vscode.commands.registerCommand(command.command, command.callback),
+    );
   }
-
-  const mainDisposable = vscode.commands.registerCommand(
-    `${EXTENSION_NAME}.selectModules`,
-    async () => {
-      const selected = await vscode.window.showQuickPick(
-        pickerOptions.map((option) => ({
-          label: option.label,
-          picked: includedModules.includes(option.module),
-        })),
-        {canPickMany: true, placeHolder: "Select modules"},
-      );
-
-      if (!selected) {
-        return;
-      }
-
-      pickerOptions.forEach(async (option) => {
-        const enabled = selected.some((s) => s.label === option.label);
-        await config.update(
-          `${option.module}.enabled`,
-          enabled,
-          vscode.ConfigurationTarget.Workspace,
-        );
-        await vscode.commands.executeCommand(
-          "setContext",
-          `${EXTENSION_NAME}.${option.module}.enabled`,
-          enabled,
-        );
-      });
-
-      updateSnippetProviders(
-        selected.map(
-          (s) => pickerOptions.find((o) => o.label === s.label)!.module,
-        ),
-      );
-    },
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      `${EXTENSION_NAME}.selectModules`,
+      selectModules,
+    ),
   );
+}
 
-  allModules.forEach(async (module) => {
+function onConfigurationChanged(context: vscode.ExtensionContext) {
+  const includedModules = getIncludedModules();
+  updateSnippetProviders(context, includedModules);
+  updateCommandsContext(includedModules);
+}
+function updateSnippetProviders(
+  context: vscode.ExtensionContext,
+  includedModules: Modules[],
+) {
+  context.subscriptions.forEach((sub, i) => {
+    if ((sub as any).__isSnippetProvider) {
+      sub.dispose();
+      context.subscriptions.splice(i, 1);
+    }
+  });
+  for (const moduleName of includedModules) {
+    const moduleSnippets = getSnippetsForModule(moduleName);
+    if (moduleSnippets === undefined || moduleSnippets.length === 0) {
+      continue;
+    }
+    const provider = vscode.languages.registerCompletionItemProvider(
+      {scheme: "file", language: "typescript"},
+      {
+        provideCompletionItems() {
+          return moduleSnippets.map((snippet) => {
+            const item = new vscode.CompletionItem(
+              snippet.prefix,
+              vscode.CompletionItemKind.Snippet,
+            );
+            item.insertText = new vscode.SnippetString(snippet.body);
+            item.detail = snippet.description;
+
+            item.filterText = snippet.prefix;
+
+            item.sortText = "0" + snippet.prefix;
+
+            return item;
+          });
+        },
+      },
+      ".",
+    );
+    (provider as any).__isSnippetProvider = true;
+    context.subscriptions.push(provider);
+  }
+}
+
+async function updateCommandsContext(includedModules: Modules[]) {
+  for (const module of allModules) {
     await vscode.commands.executeCommand(
       "setContext",
       `${EXTENSION_NAME}.${module}.enabled`,
       includedModules.includes(module),
     );
-  });
+  }
+}
 
-  updateSnippetProviders(includedModules);
+async function selectModules() {
+  const config = vscode.workspace.getConfiguration(EXTENSION_NAME);
+  const includedModules = getIncludedModules();
+  const selected = await vscode.window.showQuickPick(
+    pickerOptions.map((option) => ({
+      label: option.label,
+      picked: includedModules.includes(option.module),
+    })),
+    {canPickMany: true, placeHolder: "Select modules"},
+  );
 
-  context.subscriptions.push(mainDisposable);
+  if (!selected) {
+    return;
+  }
 
-  commands.forEach((binding) => {
-    const disposable = vscode.commands.registerCommand(
-      binding.command,
-      binding.callback,
+  pickerOptions.forEach(async (option) => {
+    const enabled = selected.some((s) => s.label === option.label);
+    await config.update(
+      `${option.module}.enabled`,
+      enabled,
+      vscode.ConfigurationTarget.Workspace,
     );
-
-    context.subscriptions.push(disposable);
   });
+}
+
+export function activate(context: vscode.ExtensionContext) {
+  onConfigurationChanged(context);
+  registerCommands(context);
+
+  const disposable = vscode.workspace.onDidChangeConfiguration(() =>
+    onConfigurationChanged(context),
+  );
+
+  context.subscriptions.push(disposable);
 }
 
 export function deactivate() {}
