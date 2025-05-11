@@ -1,19 +1,19 @@
 import {createAction} from "./createAction";
 import {createNewReduxModule} from "./createNewReduxModule";
 import {createReducer} from "./createReducer";
-import {extensionName} from "../../../extension";
+import {EXTENSION_NAME} from "../../../extension";
 
 export const bindings = [
   {
-    command: `${extensionName}.createNewReduxModule`,
+    command: `${EXTENSION_NAME}.createNewReduxModule`,
     callback: createNewReduxModule,
   },
   {
-    command: `${extensionName}.createReducer`,
+    command: `${EXTENSION_NAME}.createReducer`,
     callback: createReducer,
   },
   {
-    command: `${extensionName}.createAction`,
+    command: `${EXTENSION_NAME}.createAction`,
     callback: createAction,
   },
 ];

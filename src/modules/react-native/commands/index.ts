@@ -1,9 +1,9 @@
 import {createNewComponent} from "./createNewComponent";
-import {extensionName} from "../../../extension";
+import {EXTENSION_NAME} from "../../../extension";
 
 export const bindings = [
   {
-    command: `${extensionName}.createNewComponent`,
+    command: `${EXTENSION_NAME}.createNewComponent`,
     callback: createNewComponent,
   },
 ];

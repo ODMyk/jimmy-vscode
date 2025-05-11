@@ -1,24 +1,29 @@
-import {bindings as reduxSagaBindings} from "./redux-saga/commands";
-import {bindings as reactNativeBindings} from "./react-native/commands";
+import {bindings as reduxSagaCommands} from "./redux-saga/commands";
+import {
+  bindings as reactNativeCommands,
+  snippets as reactNativeSnippets,
+} from "./react-native";
 import {Modules} from "../extension";
 
-interface ModuleBindings {
-  module: Modules;
-  bindings: Binding[];
+export interface Snippet {
+  prefix: string;
+  body: string;
+  description: string;
 }
 
-interface Binding {
-  command: string;
-  callback: (...args: any[]) => any;
-}
+export const commands = [...reactNativeCommands, ...reduxSagaCommands];
 
-export const bindings: readonly ModuleBindings[] = Object.freeze([
-  {
-    module: Modules.ReduxSaga,
-    bindings: reduxSagaBindings,
-  },
-  {
-    module: Modules.ReactNative,
-    bindings: reactNativeBindings,
-  },
-]);
+export const getSnippetsForModule = (module: Modules): Snippet[] => {
+  switch (module) {
+    case Modules.REACT_NATIVE:
+      return reactNativeSnippets;
+    case Modules.REDUX_SAGA:
+      return [];
+    case Modules.REACT:
+      return [];
+    default:
+      const exhaustiveCheck: never = module;
+      console.log(exhaustiveCheck);
+      return [];
+  }
+};

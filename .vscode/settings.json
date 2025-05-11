@@ -10,8 +10,7 @@
   },
   // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
   "typescript.tsc.autoDetect": "off",
-  "myToolkit.react-native.enabled": true,
-  "myToolkit.redux-saga.enabled": false,
-  "react-native-tenty.react-native.enabled": true,
-  "react-native-tenty.redux-saga.enabled": false
+  "jimmy.react-native.enabled": false,
+  "jimmy.redux-saga.enabled": false,
+  "jimmy.react.enabled": false
 }

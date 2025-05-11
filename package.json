@@ -1,6 +1,6 @@
 {
-  "name": "react-native-tenty",
-  "displayName": "Tenty",
+  "name": "jimmy",
+  "displayName": "Jimmy",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -9,57 +9,68 @@
   "categories": [
     "Extension Packs"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
+    "snippets": [
+      {
+        "language": "typescript",
+        "path": "./snippets/typescript.json",
+        "enablement": "jimmy.redux-saga.enabled"
+      }
+    ],
     "commands": [
       {
-        "command": "react-native-tenty.createNewComponent",
-        "title": "Tenty: Create New Component",
-        "enablement": "react-native-tenty.react-native.enabled"
+        "command": "jimmy.createNewComponent",
+        "title": "Jimmy (RN): Create New Component",
+        "enablement": "jimmy.react-native.enabled"
       },
       {
-        "command": "react-native-tenty.createNewReduxModule",
-        "title": "Tenty: Create New Redux Module",
-        "enablement": "react-native-tenty.redux-saga.enabled"
+        "command": "jimmy.createNewReduxModule",
+        "title": "Jimmy (Redux Saga): Create New Redux Module",
+        "enablement": "jimmy.redux-saga.enabled"
       },
       {
-        "command": "react-native-tenty.createReducer",
-        "title": "Tenty: Create Reducer",
-        "enablement": "react-native-tenty.redux-saga.enabled"
+        "command": "jimmy.createReducer",
+        "title": "Jimmy (Redux Saga): Create Reducer",
+        "enablement": "jimmy.redux-saga.enabled"
       },
       {
-        "command": "react-native-tenty.createAction",
-        "title": "Tenty: Create Action",
-        "enablement": "react-native-tenty.redux-saga.enabled"
+        "command": "jimmy.createAction",
+        "title": "Jimmy (Redux Saga): Create Action",
+        "enablement": "jimmy.redux-saga.enabled"
       },
       {
-        "command": "react-native-tenty.selectModules",
-        "title": "Tenty: Select Modules"
+        "command": "jimmy.selectModules",
+        "title": "Jimmy: Select Modules"
       }
     ],
     "configuration": {
-      "title": "Tenty",
+      "title": "Jimmy",
       "properties": {
-        "react-native-tenty.redux-saga.enabled": {
+        "jimmy.redux-saga.enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable Saga-Redux-specific tools"
+          "description": "Enable Redux Saga module"
         },
-        "react-native-tenty.react-native.enabled": {
+        "jimmy.react-native.enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable React Native utilities"
+          "description": "Enable React Native module"
         },
-        "react-native-tenty.react.enabled": {
+        "jimmy.react.enabled": {
           "type": "boolean",
           "default": false,
-          "description": "Enable React utilities"
+          "description": "Enable React module"
         }
       }
     }
   },
   "publisher": "DMykO",
+  "license": "MIT",
+  "repository": {},
   "scripts": {
     "vscode:prepublish": "yarn run package",
     "compile": "webpack",
